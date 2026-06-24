@@ -4,6 +4,13 @@ This is a Transaction API, built with **FastAPI** and powered by **PostgreSQL**.
 ## Youtube Link
 https://youtu.be/s-Xh0Vn9py0 
 
+
+## Frontend and Backend Links
+Frontend - https://transaction-api-omega.vercel.app/
+Backend  -  https://transaction-api-up7z.onrender.com
+
+
+
 ## Prerequisites
 - **Python 3.8+** installed on your system.
 - **PostgreSQL** database running.
