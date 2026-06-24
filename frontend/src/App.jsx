@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000/api';
+const API_URL = import.meta.env.VITE_API_URL;
 
 function App() {
   const [user, setUser] = useState(null); // { id, name }
-  
+
   // Section 1: Create User
   const [nameInput, setNameInput] = useState('');
   const [isCreatingUser, setIsCreatingUser] = useState(false);
@@ -19,7 +19,7 @@ function App() {
   // Section 3: Leaderboard & Summary
   const [rankings, setRankings] = useState([]);
   const [isFetchingRankings, setIsFetchingRankings] = useState(false);
-  
+
   const [summary, setSummary] = useState(null);
   const [isFetchingSummary, setIsFetchingSummary] = useState(false);
 
@@ -138,7 +138,7 @@ function App() {
           <section className="card glass-effect">
             <h2>2. Submit Points</h2>
             <form onSubmit={handleSubmitTx} className="action-form">
-               <p className="section-desc">Add points to climb the leaderboard.</p>
+              <p className="section-desc">Add points to climb the leaderboard.</p>
               <div className="input-group">
                 <input
                   type="number"
@@ -230,7 +230,7 @@ function App() {
                 <span className="stat-value">{summary.transaction_count}</span>
               </div>
             </div>
-            
+
             <h3 className="sub-heading">Transaction History</h3>
             <div className="table-responsive">
               <table className="history-table">
