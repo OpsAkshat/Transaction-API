@@ -34,7 +34,7 @@ function App() {
     setIsCreatingUser(true);
     setUserError(null);
     try {
-      const res = await axios.post(`${API_URL}/user`, { name: nameInput });
+      const res = await axios.post(`${API_URL}/api/user`, { name: nameInput });
       setUser({ id: res.data.id, name: res.data.name });
       setNameInput('');
     } catch (err) {
@@ -53,7 +53,7 @@ function App() {
     setIsSubmittingTx(true);
     setTxMessage(null);
     try {
-      await axios.post(`${API_URL}/transaction`, {
+      await axios.post(`${API_URL}/api/transaction`, {
         user_id: user.id,
         points: Number(pointsInput)
       });
@@ -70,7 +70,7 @@ function App() {
   const fetchRankings = async () => {
     setIsFetchingRankings(true);
     try {
-      const res = await axios.get(`${API_URL}/ranking`);
+      const res = await axios.get(`${API_URL}/api/ranking`);
       setRankings(res.data.rankings || []);
     } catch (err) {
       console.error("Failed to fetch rankings", err);
@@ -83,7 +83,7 @@ function App() {
     if (!user) return;
     setIsFetchingSummary(true);
     try {
-      const res = await axios.get(`${API_URL}/summary/${user.id}`);
+      const res = await axios.get(`${API_URL}/api/summary/${user.id}`);
       setSummary(res.data);
     } catch (err) {
       console.error("Failed to fetch summary", err);
