@@ -69,3 +69,34 @@ Start the frontend app:
 npm run dev
 ```
 - The React application will be accessible via the local URL provided in your terminal (typically [http://localhost:5173](http://localhost:5173)).
+
+---
+
+## ⚙️ How It Works
+
+### How each API works
+
+- `POST /api/user`: Registers a new user. It checks if the requested name already exists. If not, it creates a new user with a unique ID and initializes their points and transaction count to 0.
+- `POST /api/transaction`: Submits a new transaction for an existing user. The API accepts the `user_id` and the `points` to add (maximum 10,000 points per transaction). It updates the user's total points, increments their transaction count, and records the timestamp of the latest transaction.
+- `GET /api/summary/{user_id}`: Retrieves a specific user's summary. This includes their total points, total transaction count, the time of their last transaction, and a descending chronological history of all their individual transactions.
+- `GET /api/ranking`: Returns a list of all users, sorted by their dynamically calculated `ranking_score` in descending order.
+
+### How ranking is calculated
+
+The leaderboard ranking is determined by a dynamically calculated **Ranking Score** (out of ~100 points maximum), which comprises three weighted factors:
+
+1. **Total Points (60% weight):** Calculated proportionally against the user with the highest total points globally. 
+   *(Formula: `(user.total_points / max_points_among_all_users) * 60`)*
+2. **Consistency (25% weight):** Calculated proportionally against the user with the highest transaction count globally. 
+   *(Formula: `(user.transaction_count / max_transactions_among_all_users) * 25`)*
+3. **Recency (15% weight):** Users receive up to 15 points for recent activity. They lose 1 point for every day of inactivity since their last transaction (down to a minimum of 0 points). 
+   *(Formula: `max(0, 15 - days_since_last_transaction)`)*
+
+The final `ranking_score` is the sum of these three factors, rounded to two decimal places. Users are sorted based on this score, with the highest score taking Rank 1.
+
+### How duplicate requests are prevented
+
+Duplicate requests and race conditions are prevented using two main mechanisms:
+
+1. **In-Memory Asynchronous Locks:** When a transaction is submitted (`POST /api/transaction`), the backend acquires an `asyncio.Lock` specifically tied to that `user_id`. This prevents concurrent requests for the same user from executing simultaneously, ensuring that calculations (like adding to total points) do not suffer from race conditions or data overwrites.
+2. **Database Integrity and Constraints:** The database utilizes a `UniqueConstraint` on the `idempotency_key` in the transactions table. The backend transaction logic is wrapped in a `try/except IntegrityError` block. If a duplicate transaction insertion is attempted that violates unique constraints, the database safely rolls back the operation, and the API returns a `409 Conflict` (Duplicate transaction) response.
